@@ -31,8 +31,6 @@ impl Field {
     pub fn new(attrs: Vec<Attribute>, inferred_tag: Option<u32>) -> Result<Option<Field>, Error> {
         let attrs = prost_attrs(attrs)?;
 
-        // TODO: check for ignore attribute.
-
         let field = if let Some(field) = scalar::Field::new(&attrs, inferred_tag)? {
             Field::Scalar(field)
         } else if let Some(field) = message::Field::new(&attrs, inferred_tag)? {
@@ -42,7 +40,8 @@ impl Field {
         } else if let Some(field) = oneof::Field::new(&attrs)? {
             Field::Oneof(field)
         } else {
-            bail!("no type attribute");
+            // Ignore field.
+            return Ok(None);
         };
 
         Ok(Some(field))

@@ -133,11 +133,6 @@ fn try_message(input: TokenStream) -> Result<TokenStream, Error> {
         .iter()
         .map(|&(ref field_ident, ref field)| field.clear(quote!(self.#field_ident)));
 
-    let default = fields.iter().map(|&(ref field_ident, ref field)| {
-        let value = field.default();
-        quote!(#field_ident: #value,)
-    });
-
     let methods = fields
         .iter()
         .flat_map(|&(ref field_ident, ref field)| field.methods(field_ident))
@@ -204,14 +199,6 @@ fn try_message(input: TokenStream) -> Result<TokenStream, Error> {
 
                 fn clear(&mut self) {
                     #(#clear;)*
-                }
-            }
-
-            impl Default for #ident {
-                fn default() -> #ident {
-                    #ident {
-                        #(#default)*
-                    }
                 }
             }
 
