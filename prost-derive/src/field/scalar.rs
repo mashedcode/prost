@@ -278,6 +278,7 @@ impl Field {
         if ident_str.starts_with("r#") {
             ident_str = ident_str[2..].to_owned();
         }
+        let get = Ident::new(&format!("get_{}", ident_str), Span::call_site());
 
         if let Ty::Enumeration(ref ty) = self.ty {
             let set = Ident::new(&format!("set_{}", ident_str), Span::call_site());
@@ -291,7 +292,7 @@ impl Field {
                     );
                     quote! {
                         #[doc=#get_doc]
-                        pub fn #ident(&self) -> #ty {
+                        pub fn #get(&self) -> #ty {
                             #ty::from_i32(self.#ident).unwrap_or(#default)
                         }
 
@@ -309,7 +310,7 @@ impl Field {
                     );
                     quote! {
                         #[doc=#get_doc]
-                        pub fn #ident(&self) -> #ty {
+                        pub fn #get(&self) -> #ty {
                             self.#ident.and_then(#ty::from_i32).unwrap_or(#default)
                         }
 
@@ -328,7 +329,7 @@ impl Field {
                     let push_doc = format!("Appends the provided enum value to `{}`.", ident_str);
                     quote! {
                         #[doc=#iter_doc]
-                        pub fn #ident(&self) -> ::std::iter::FilterMap<
+                        pub fn #get(&self) -> ::std::iter::FilterMap<
                             ::std::iter::Cloned<::std::slice::Iter<i32>>,
                             fn(i32) -> Option<#ty>,
                         > {
@@ -357,7 +358,7 @@ impl Field {
 
             Some(quote! {
                 #[doc=#get_doc]
-                pub fn #ident(&self) -> #ty {
+                pub fn #get(&self) -> #ty {
                     match self.#ident {
                         #match_some
                         ::std::option::Option::None => #default,
